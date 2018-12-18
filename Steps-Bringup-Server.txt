@@ -1,0 +1,53 @@
+http://184.105.181.220:8000
+
+echo " Stopping the docker container "
+sudo docker stop $(sudo docker ps -aq)
+
+sleep 1
+echo " Removing the docker conainer "
+sudo docker rm $(sudo docker ps -aq)
+
+sleep 1
+echo " Remove docker volume "
+sudo docker volume rm $(sudo docker volume ls | awk '{print $2}')
+
+sleep 1
+echo " Dumping empty container and volume "
+sudo docker ps -a
+sudo docker volume ls
+
+echo " Install the iptables "
+sudo iptables -A INPUT -p tcp --dport 8000 -j ACCEPT
+
+sleep 1
+echo " StartFabic.sh Script "
+sudo ./startFabric.sh
+
+sleep 1
+echo " Re-Create Node Modules "
+rm -rf node_modules/
+
+sleep 1
+echo " Installing npm "
+npm install
+
+sleep 5
+echo " Clearing the hfc key store "
+rm -rf /home/paperspace/.hfc-key-store/
+
+sleep 1
+echo " Start the Admin "
+node registerAdmin.js
+
+sleep 1
+echo " Start the User "
+node registerUser.js
+
+sleep 1
+echo " Start the server "
+node server.js
+
+
+
+
+
